@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
         validate: [validator.isEmail, 'plese insert a valid email']
     },
     photo: String,
+    role: {
+        type: String,
+        enum: ['user', 'guide', 'lead-guide', 'admin'],
+        default: 'user'
+    },
     password: {
         type: String,
         require: [true, 'a user must have a password'],
@@ -54,7 +59,7 @@ userSchema.methods.correctPassword = async function (
 };
 
 userSchema.methods.ChangedPasswordAfter = function (JWTTimesStamp) {
-    if (true) {
+    if (this.passwordChangeAt) {
         const changeTimeStamp = parseInt(
             this.passwordChangeAt.getTime() / 1000,
             10

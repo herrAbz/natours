@@ -73,3 +73,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.user = freshUser;
     next();
 });
+
+exports.restrictTO = catchAsync(async (req, res, next) => {
+
+})
