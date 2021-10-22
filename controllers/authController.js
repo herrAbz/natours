@@ -17,7 +17,8 @@ exports.signup = catchAsync(async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
-        passwordChangeAt: req.body.passwordChangeAt
+        passwordChangeAt: req.body.passwordChangeAt,
+        role: req.body.role
     });
     const token = signToken(newUser._id);
     res.status(201).json({
@@ -74,6 +75,25 @@ exports.protect = catchAsync(async (req, res, next) => {
     next();
 });
 
-exports.restrictTO = catchAsync(async (req, res, next) => {
+exports.restrictTO = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new AppError('you do not permisson to access', 403));
+        }
+        next();
+    };
+};
 
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+    //1 get user based on posted Email
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return next(new AppError('this is no user with email addres', 404))
+    }
+    //2 generate the random tokens
+    const restToken = user.creatPasswordRestToken();
+    await user.save({ validateBeforeSave: false });
+
+    //3 send it to users email
 })
+exports.restPassword = (req, res, next) => { }
